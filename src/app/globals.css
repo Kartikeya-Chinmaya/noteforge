@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a2e;
+  --bg-card: #16213e;
+  --bg-card-hover: #1a2745;
+  --pacman-yellow: #FFD700;
+  --pacman-blue: #2121DE;
+  --ghost-red: #FF0000;
+  --ghost-pink: #FFB8FF;
+  --ghost-cyan: #00FFFF;
+  --ghost-orange: #FFB852;
+  --maze-blue: #2121DE;
+  --minecraft-green: #5D8C3E;
+  --minecraft-dirt: #8B5A2B;
+  --minecraft-stone: #7A7A7A;
+  --dot-color: #FFB8FF;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --text-muted: #666666;
+  --border: #2121DE;
+  --border-hover: #4444FF;
+}
+
+* {
+  box-sizing: border-box;
+  image-rendering: pixelated;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'VT323', monospace;
+  min-height: 100vh;
+}
+
+/* Pac-dot grid background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle, rgba(255, 184, 255, 0.08) 2px, transparent 2px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-family: 'Press Start 2P', cursive;
+  letter-spacing: 0.05em;
+}
+
+/* Pixel card */
+.nf-card {
+  background: var(--bg-card);
+  border: 4px solid var(--maze-blue);
+  padding: 1rem;
+  transition: all 0.15s step-end;
+  image-rendering: pixelated;
+}
+
+.nf-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: scale(1.03);
+}
+
+.nf-card.selected {
+  background: #1a3a1a;
+  border-color: var(--pacman-yellow);
+  box-shadow:
+    0 0 0 2px var(--bg-primary),
+    0 0 0 6px var(--pacman-yellow),
+    0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+/* Pixel buttons */
+.nf-btn {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 11px;
+  padding: 12px 24px;
+  border: 4px solid var(--maze-blue);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+}
+
+.nf-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.nf-btn-primary {
+  background: var(--pacman-yellow);
+  color: #000000;
+  border-color: #B8960B;
+  font-weight: 700;
+}
+
+.nf-btn-primary:hover {
+  background: #FFE44D;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+}
+
+.nf-btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.nf-btn-secondary {
+  background: var(--bg-secondary);
+  border-color: var(--minecraft-stone);
+  color: var(--text-secondary);
+}
+
+.nf-btn-secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 4px dashed var(--maze-blue);
+  background: var(--bg-secondary);
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-zone:hover {
+  border-color: var(--ghost-cyan);
+  background: var(--bg-card);
+}
+
+.upload-zone.dragover {
+  border-color: var(--pacman-yellow);
+  background: #1a2a1a;
+  box-shadow: inset 0 0 40px rgba(255, 215, 0, 0.05);
+}
+
+/* Output display */
+.output-container {
+  background: var(--bg-secondary);
+  border: 4px solid var(--maze-blue);
+  color: var(--text-primary);
+  padding: 1.5rem;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Textarea */
+.nf-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--bg-secondary);
+  border: 4px solid var(--maze-blue);
+  color: var(--text-primary);
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.6;
+  padding: 1rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.nf-textarea:focus {
+  border-color: var(--ghost-cyan);
+}
+
+.nf-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Pixel scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-left: 4px solid var(--maze-blue);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--maze-blue);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Loading animation - pac-man chomp */
+.loading-chomp {
+  animation: chomp 0.4s linear infinite;
+}
+
+@keyframes chomp {
+  0%, 100% {
+    clip-path: polygon(100% 0%, 100% 100%, 50% 50%, 100% 0%,
+      0% 0%, 0% 100%, 100% 100%);
+  }
+  50% {
+    clip-path: polygon(100% 0%, 100% 100%, 50% 75%, 100% 100%,
+      0% 100%, 0% 0%, 100% 0%);
+  }
+}
+
+/* Blinking dots */
+.dot-blink {
+  animation: dotblink 1.2s step-end infinite;
+}
+
+@keyframes dotblink {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0; }
+}
+
+/* Pac-dot loading */
+.pac-dots {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pac-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--dot-color);
+  border-radius: 50%;
+  animation: eatdot 1.5s ease-in-out infinite;
+}
+
+.pac-dot:nth-child(2) { animation-delay: 0.2s; }
+.pac-dot:nth-child(3) { animation-delay: 0.4s; }
+.pac-dot:nth-child(4) { animation-delay: 0.6s; }
+.pac-dot:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes eatdot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.2; transform: scale(0.3); }
+}
+
+/* Glow text */
+.glow-yellow {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+/* Maze border decoration */
+.maze-border {
+  border: 4px solid var(--maze-blue);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-primary),
+    inset 0 0 0 4px var(--maze-blue);
+}
