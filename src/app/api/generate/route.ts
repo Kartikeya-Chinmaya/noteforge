@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
+// Allow up to 60s for Vercel serverless function
+export const maxDuration = 60;
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
 type OutputStyle = 'short' | 'standard' | 'detailed' | 'learn';
@@ -35,8 +38,10 @@ Format the Q&A section clearly with Q: and A: prefixes.`
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
+    // pdf-parse tries to load a test PDF on require(), which fails on Vercel.
+    // Import the core module directly to avoid that.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse');
+    const pdfParse = require('pdf-parse/lib/pdf-parse.js');
     const data = await pdfParse(buffer);
     return data.text;
   } catch (error) {
@@ -126,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     if (!process.env.GROQ_API_KEY) {
       return NextResponse.json(
-        { error: 'Groq API key not configured. Please add GROQ_API_KEY to your .env.local file.' },
+        { error: 'Groq API key not configured. Please add GROQ_API_KEY to your environment variables.' },
         { status: 500 }
       );
     }
