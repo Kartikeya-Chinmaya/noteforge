@@ -22,7 +22,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
 
-  // Konami code: ↑↑↓↓←→←→BA
+  // Konami code: ↑↑↓↓←→←→ba
   useEffect(() => {
     const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
     let pos = 0;
@@ -242,7 +242,7 @@ export default function Home() {
           &copy; NOTEFORGE 2026 &bull; POWERED BY GROQ
         </p>
         <p className="text-[var(--text-muted)] opacity-45" style={{ fontFamily: 'VT323, monospace', fontSize: '14px' }}>
-          ↑↑↓↓←→←→BA
+          ↑↑↓↓←→←→ba
         </p>
       </footer>
 
