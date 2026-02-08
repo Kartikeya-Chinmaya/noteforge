@@ -64,13 +64,14 @@ async function callGroq(messages: Array<{ role: string; content: unknown }>, mod
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
+    // Use direct path to skip pdf-parse's test file loading which crashes on Vercel
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse');
+    const pdfParse = require('pdf-parse/lib/pdf-parse.js');
     const data = await pdfParse(buffer);
     return data.text;
   } catch (error) {
     console.error('PDF parsing error:', error);
-    throw new Error('Failed to parse PDF file');
+    throw new Error('Failed to parse PDF. The file may be corrupted or password-protected.');
   }
 }
 
@@ -108,7 +109,7 @@ async function processImageWithGroq(buffer: Buffer, mimeType: string): Promise<s
         ],
       },
     ],
-    'llama-3.2-90b-vision-preview',
+    'meta-llama/llama-4-scout-17b-16e-instruct',
     4096
   );
 }
