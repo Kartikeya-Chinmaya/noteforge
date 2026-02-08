@@ -4,7 +4,13 @@ import Groq from 'groq-sdk';
 // Allow up to 60s for Vercel serverless function
 export const maxDuration = 60;
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
+function getGroqClient() {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    throw new Error('GROQ_API_KEY environment variable is not set');
+  }
+  return new Groq({ apiKey });
+}
 
 type OutputStyle = 'short' | 'standard' | 'detailed' | 'learn';
 
@@ -66,6 +72,7 @@ async function processImageWithGroq(buffer: Buffer, mimeType: string): Promise<s
   const base64Image = buffer.toString('base64');
   const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
+  const groq = getGroqClient();
   const response = await groq.chat.completions.create({
     model: 'llama-3.2-90b-vision-preview',
     messages: [
@@ -100,6 +107,7 @@ ${content}
 
 Create the notes now. Use plain text formatting (no markdown symbols like ** or ##). Use CAPS for headings and - for bullet points.`;
 
+  const groq = getGroqClient();
   const response = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
@@ -125,13 +133,6 @@ export async function POST(request: NextRequest) {
 
     if (!outputStyle) {
       return NextResponse.json({ error: 'Output style is required' }, { status: 400 });
-    }
-
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json(
-        { error: 'Groq API key not configured. Please add GROQ_API_KEY to your environment variables.' },
-        { status: 500 }
-      );
     }
 
     let content = '';
