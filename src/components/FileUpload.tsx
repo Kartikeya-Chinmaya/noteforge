@@ -119,6 +119,9 @@ export default function FileUpload({ fileType, onFileSelect, onBack }: FileUploa
             <p className="text-[var(--text-muted)]" style={{ fontFamily: 'VT323, monospace', fontSize: '16px' }}>
               ACCEPTS: {acceptTypes[fileType]}
             </p>
+            <p className="text-[var(--text-muted)] mt-2" style={{ fontFamily: 'VT323, monospace', fontSize: '14px', opacity: 0.6 }}>
+              FILES UNDER 4.5MB RECOMMENDED FOR BEST RESULTS
+            </p>
           </div>
         )}
       </div>
