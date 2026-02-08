@@ -85,10 +85,27 @@ export default function Home() {
       formData.append('fileType', fileType || 'text');
       formData.append('outputStyle', outputStyle);
 
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 55000);
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const text = await response.text();
+        try {
+          const data = JSON.parse(text);
+          setNotes(`ERROR: ${data.error || `Server error (${response.status})`}`);
+        } catch {
+          setNotes(`ERROR: Server returned ${response.status}. The API may have timed out or crashed.`);
+        }
+        return;
+      }
 
       const data = await response.json();
 
@@ -98,7 +115,11 @@ export default function Home() {
         setNotes(data.notes);
       }
     } catch (error) {
-      setNotes('ERROR: Failed to generate notes. Please try again.');
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        setNotes('ERROR: Request timed out. The server took too long to respond.');
+      } else {
+        setNotes(`ERROR: Failed to generate notes. ${error instanceof Error ? error.message : 'Please try again.'}`);
+      }
     } finally {
       setIsLoading(false);
     }
