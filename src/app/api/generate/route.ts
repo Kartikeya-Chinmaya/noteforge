@@ -64,11 +64,9 @@ async function callGroq(messages: Array<{ role: string; content: unknown }>, mod
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Use direct path to skip pdf-parse's test file loading which crashes on Vercel
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse/lib/pdf-parse.js');
-    const data = await pdfParse(buffer);
-    return data.text;
+    const { extractText } = await import('unpdf');
+    const result = await extractText(new Uint8Array(buffer));
+    return Array.isArray(result.text) ? result.text.join('\n') : result.text;
   } catch (error) {
     console.error('PDF parsing error:', error);
     throw new Error('Failed to parse PDF. The file may be corrupted or password-protected.');
