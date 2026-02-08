@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
-// Allow up to 60s for Vercel serverless function
 export const maxDuration = 60;
 
-function getGroqClient() {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error('GROQ_API_KEY environment variable is not set');
-  }
-  return new Groq({ apiKey });
-}
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 type OutputStyle = 'short' | 'standard' | 'detailed' | 'learn';
 
@@ -42,6 +34,34 @@ Include:
 Format the Q&A section clearly with Q: and A: prefixes.`
 };
 
+async function callGroq(messages: Array<{ role: string; content: unknown }>, model: string, maxTokens: number): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    throw new Error('GROQ_API_KEY environment variable is not set');
+  }
+
+  const res = await fetch(GROQ_API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Groq API error (${res.status}): ${errorText}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -72,10 +92,8 @@ async function processImageWithGroq(buffer: Buffer, mimeType: string): Promise<s
   const base64Image = buffer.toString('base64');
   const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
-  const groq = getGroqClient();
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.2-90b-vision-preview',
-    messages: [
+  return callGroq(
+    [
       {
         role: 'user',
         content: [
@@ -90,10 +108,9 @@ async function processImageWithGroq(buffer: Buffer, mimeType: string): Promise<s
         ],
       },
     ],
-    max_tokens: 4096,
-  });
-
-  return response.choices[0]?.message?.content || '';
+    'llama-3.2-90b-vision-preview',
+    4096
+  );
 }
 
 async function generateNotes(content: string, style: OutputStyle): Promise<string> {
@@ -107,19 +124,11 @@ ${content}
 
 Create the notes now. Use plain text formatting (no markdown symbols like ** or ##). Use CAPS for headings and - for bullet points.`;
 
-  const groq = getGroqClient();
-  const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-    max_tokens: 4096,
-  });
-
-  return response.choices[0]?.message?.content || '';
+  return callGroq(
+    [{ role: 'user', content: prompt }],
+    'llama-3.3-70b-versatile',
+    4096
+  );
 }
 
 export async function POST(request: NextRequest) {
