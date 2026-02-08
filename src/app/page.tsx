@@ -7,6 +7,7 @@ import OutputStyleSelector from '@/components/OutputStyleSelector';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import StepIndicator from '@/components/StepIndicator';
 import PacManGame from '@/components/PacManGame';
+import { extractTextClientSide } from '@/utils/clientParser';
 
 type FileType = 'pdf' | 'ppt' | 'image' | 'text' | 'others';
 type OutputStyle = 'short' | 'standard' | 'detailed' | 'learn';
@@ -77,7 +78,13 @@ export default function Home() {
       const formData = new FormData();
 
       if (file) {
-        formData.append('file', file);
+        // Try client-side text extraction first (avoids Vercel 4.5MB body limit)
+        const clientText = await extractTextClientSide(file, fileType || '');
+        if (clientText && clientText.trim().length > 0) {
+          formData.append('text', clientText);
+        } else {
+          formData.append('file', file);
+        }
       } else if (textContent) {
         formData.append('text', textContent);
       }
