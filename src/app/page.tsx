@@ -239,7 +239,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full px-6 md:px-12 py-6 border-t-4 border-[var(--maze-blue)] flex items-center justify-between">
         <p className="text-[var(--text-muted)] text-sm" style={{ fontFamily: 'VT323, monospace', fontSize: '18px' }}>
-          &copy; NOTEFORGE 2025 &bull; POWERED BY GROQ
+          &copy; NOTEFORGE 2026 &bull; POWERED BY GROQ
         </p>
         <p className="text-[var(--text-muted)] opacity-45" style={{ fontFamily: 'VT323, monospace', fontSize: '14px' }}>
           ↑↑↓↓←→←→BA
