@@ -38,10 +38,8 @@ Format the Q&A section clearly with Q: and A: prefixes.`
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // pdf-parse tries to load a test PDF on require(), which fails on Vercel.
-    // Import the core module directly to avoid that.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse/lib/pdf-parse.js');
+    const pdfParse = require('pdf-parse');
     const data = await pdfParse(buffer);
     return data.text;
   } catch (error) {
